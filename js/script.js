@@ -65,6 +65,16 @@ function onPaymentChosen(e){
     }
 }
 
+function adjustValidTags(element, properInputBool){
+    if(!properInputBool && !element.parentElement.classList.contains("not-valid")){
+        element.parentElement.classList.add("not-valid");
+        element.parentElement.lastElementChild.classList.toggle("hint");
+    }else if(properInputBool && element.parentElement.classList.contains("not-valid")){     
+        element.parentElement.classList.remove("not-valid");
+        element.parentElement.lastElementChild.classList.toggle("hint");
+        
+    }
+}
 function onSubmit(e){
     e.preventDefault();
     console.log(`name validation: ${nameValidation()}`);
@@ -80,39 +90,45 @@ function onSubmit(e){
 function nameValidation(){
     const regex = /\S/;
     const value = regex.test(name_input.value);
-    if(value === false){
-        name_input.parentElement.classList.add("not-valid");
-        console.log(name_input.parentElement.lastElementChild);
-        // name_input.parentElement.lastElementChild.style.display = "";
-    }
+    adjustValidTags(name_input, value);
+      
     return value;
-
 }
+
 function emailValidation(){
     const email = document.getElementById("email");
     const regex = /^(\w|\d)+@(\w)+\.com$/;
-    return regex.test(email.value);
+    const properEmailCheck = regex.test(email.value);
+    adjustValidTags(email, properEmailCheck);
+
+    return properEmailCheck;
 
 }
 function activityValidation(){
     const total_element = document.getElementById("activities-cost");
     const total_value = parseInt(total_element.textContent.substring(8));
-    return (total_value>0);
+    const activityCheck = (total_value>0);
+    adjustValidTags(total_element,activityCheck);
+    return activityCheck;
 }
 function creditValidation(){
     function regex_fn(exp,value){
         const regex = exp;
         return regex.test(value);
     }
-    const card_number = document.getElementById("cc-num").value;
-    const zip_code = document.getElementById("zip").value;
-    const cvv_number = document.getElementById("cvv").value;
+    const card_number = document.getElementById("cc-num");
+    const zip_code = document.getElementById("zip");
+    const cvv_number = document.getElementById("cvv");
 
-    const card = regex_fn(/^(\d){13,16}$/,card_number);
-    const zip = regex_fn(/^(\d){5}$/,zip_code);
-    const cvv = regex_fn(/^(\d){3}$/,cvv_number);
+    const card = regex_fn(/^(\d){13,16}$/,card_number.value);
+    const zip = regex_fn(/^(\d){5}$/,zip_code.value);
+    const cvv = regex_fn(/^(\d){3}$/,cvv_number.value);
 
-    return (card && zip && cvv); 
+    adjustValidTags(card_number , card);
+    adjustValidTags(zip_code , zip);
+    adjustValidTags(cvv_number , cvv);
+
+    return (card && zip && cvv);
     
 }
 
