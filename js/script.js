@@ -1,4 +1,5 @@
 const name_input = document.getElementById("name");
+const email_input = document.getElementById("email");
 const other_roles_input = document.getElementById("other-job-role");
 const job_roles_select = document.getElementById("title");
 const shirt_colors_select = document.getElementById("color");
@@ -10,6 +11,7 @@ const payment_fieldset = document.querySelector(".payment-methods");
 const payment_select = document.getElementById("payment");
 const form = document.querySelector("form");
 
+/* event listeners */
 function onFirstLoad(){
     name_input.focus();
     other_roles_input.style.display = "none";
@@ -44,17 +46,44 @@ function onDesignChosen(e){
     
 }
 
+function conflictPrevention(activity_input){ 
+    const inputKey = 0;   
+    const timeKey = 2; 
+    const activity = activity_input.parentElement;
+    const labels = activity_box.children;
+    const activityHasATime = !(activity === labels[0]);
+
+    if(activityHasATime){
+        for(let i = 1; i < labels.length; i++){
+            if(activity !== labels[i]){
+                const tempActivity = labels[i].children;
+                const activitiesHaveSameTime = activity.children[timeKey].textContent === tempActivity[timeKey].textContent;
+                
+                if(activitiesHaveSameTime){
+                    if(activity_input.checked){
+                        labels[i].classList.add("disabled");
+                        tempActivity[inputKey].disabled = true;
+                    }else{
+                        labels[i].classList.remove("disabled")
+                        tempActivity[inputKey].disabled = false;
+                    }
+                }
+            }
+        }
+    }
+}
 function onActivityChosen(e){
     const activity = e.target;
+    conflictPrevention(activity);
+
     const total_element = document.getElementById("activities-cost");
     let total_value = parseInt(total_element.textContent.substring(8));
-    if(activity.checked){
-        total_value+=parseInt(activity.attributes["data-cost"].textContent);
-    }else{
-        total_value-=parseInt(activity.attributes["data-cost"].textContent); 
-    }
+    const activity_cost = parseInt(activity.attributes["data-cost"].textContent);
+    (activity.checked)? (total_value+=activity_cost) : (total_value-= activity_cost);
+    
     total_element.textContent= `Total: $${total_value}`;
 }
+
 function onPaymentChosen(e){
     const payment_chosen = e.target.value;
     for(let i = 2; i < payment_fieldset.children.length; i++){
@@ -65,6 +94,7 @@ function onPaymentChosen(e){
     }
 }
 
+/* submit functions */
 function adjustValidTags(element, properInputBool){
     if(!properInputBool && !element.parentElement.classList.contains("not-valid")){
         element.parentElement.classList.add("not-valid");
@@ -86,7 +116,6 @@ function onSubmit(e){
     }
     
 }
-
 function nameValidation(){
     const regex = /\S/;
     const value = regex.test(name_input.value);
@@ -94,12 +123,10 @@ function nameValidation(){
       
     return value;
 }
-
 function emailValidation(){
-    const email = document.getElementById("email");
     const regex = /^(\w|\d)+@(\w)+\.com$/;
-    const properEmailCheck = regex.test(email.value);
-    adjustValidTags(email, properEmailCheck);
+    const properEmailCheck = regex.test(email_input.value);
+    adjustValidTags(email_input, properEmailCheck);
 
     return properEmailCheck;
 
@@ -132,14 +159,14 @@ function creditValidation(){
     
 }
 
+/* focus and blur */
 function onActivityFocus(e){
-    // console.log(e.target.parentElement);
     e.target.parentElement.className = "focus";
 }
 function onActivityBlur(e){
-    // console.log(e.target.parentElement);
     e.target.parentElement.className = "";
 }
+
 
 /* --------main------------ */
 onFirstLoad();
@@ -149,6 +176,8 @@ design_select.addEventListener("change",onDesignChosen);
 activity_fieldset.addEventListener("change",onActivityChosen);
 payment_select.addEventListener("change",onPaymentChosen);
 form.addEventListener("submit",onSubmit);
+email_input.addEventListener("keyup",emailValidation);
+
 
 const checkboxes = document.querySelectorAll("input[type=checkbox]");
 for(let i = 0; i < checkboxes.length; i++){
