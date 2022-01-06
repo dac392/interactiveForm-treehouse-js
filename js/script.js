@@ -106,13 +106,18 @@ function adjustValidTags(element, properInputBool){
     }
 }
 function onSubmit(e){
-    e.preventDefault();
-    console.log(`name validation: ${nameValidation()}`);
-    console.log(`email validation: ${emailValidation()}`);
-    console.log(`activity validation: ${activityValidation()}`);
+    
+    const succesful = nameValidation()&emailValidation()&activityValidation();
+    if(!succesful){
+        e.preventDefault();
+    }
+    // console.log(`name validation: ${nameValidation()}`);
+    // console.log(`email validation: ${emailValidation()}`);
+    // console.log(`activity validation: ${activityValidation()}`);
 
-    if(payment_select.value === "credit-card"){
-        console.log(`credit-card validation: ${creditValidation()}`);
+    if(payment_select.value === "credit-card"&(!creditValidation())){
+        e.preventDefault();
+        // console.log(`credit-card validation: ${creditValidation()}`);
     }
     
 }
